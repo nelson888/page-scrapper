@@ -9,7 +9,7 @@ import java.util.List;
 public class Arguments {
 
   @Parameter(description = "url(s) to scrap", required = true)
-  List<String> urls;
+  private List<String> urls;
 
   @Parameter(names = {"-dir", "--directory"}, description = "The directory in which the images/links will be saved", required = true)
   private String directory;
