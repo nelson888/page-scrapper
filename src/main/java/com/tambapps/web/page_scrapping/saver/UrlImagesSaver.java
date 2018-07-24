@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.Executors;
 
 public class UrlImagesSaver {
 
@@ -23,8 +23,9 @@ public class UrlImagesSaver {
 
   private final ExecutorCompletionService<Integer> executorService;
   private final File directory;
-  public UrlImagesSaver(int nbThreads, File directory) {
-    executorService = new ExecutorCompletionService<>(Executors.newFixedThreadPool(nbThreads));
+
+  public UrlImagesSaver(Executor executor, File directory) {
+    executorService = new ExecutorCompletionService<>(executor);
     this.directory = directory;
   }
 
@@ -40,14 +41,15 @@ public class UrlImagesSaver {
         returnCode = executorService.take().get();
       } catch (InterruptedException | ExecutionException e) {
         Printer.verbose("Error: %s", e);
+        continue;
       }
       outputTasks.put(returnCode, outputTasks.getOrDefault(returnCode, 0) + 1);
     }
-
     return outputTasks;
   }
 
   private class SaveTask implements Callable<Integer> {
+
     private URL url;
 
     SaveTask(URL url) {

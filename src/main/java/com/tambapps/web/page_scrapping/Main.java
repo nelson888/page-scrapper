@@ -6,6 +6,7 @@ import com.tambapps.web.page_scrapping.parameters.Arguments;
 import com.tambapps.web.page_scrapping.parameters.ScrappingType;
 import com.tambapps.web.page_scrapping.printing.Printer;
 import com.tambapps.web.page_scrapping.saver.UrlImagesSaver;
+import com.tambapps.web.page_scrapping.util.ExecutorSupplier;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,6 +20,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -49,12 +52,19 @@ public class Main {
       return;
     }
 
+    ExecutorSupplier executorSupplier = new ExecutorSupplier(arguments.getNbThreads());
+
     for (String url : arguments.getUrls()) {
-      scrapUrl(arguments.getNbThreads(), url, arguments.getType(), directory);
+      scrapUrl(executorSupplier, url, arguments.getType(), directory);
+    }
+
+    if (executorSupplier.wasSupplied()) {
+      executorSupplier.get().shutdown();
     }
   }
 
-  private static void scrapUrl(int nbThreads, String url, ScrappingType type, File root) {
+  private static void scrapUrl(Supplier<ExecutorService> executorSupplier, String url,
+      ScrappingType type, File root) {
     Document doc;
     try {
       doc = Jsoup.connect(url).get();
@@ -70,11 +80,11 @@ public class Main {
         saveLinks(doc, root);
         break;
       case IMAGES:
-        saveImages(nbThreads, doc, root);
+        saveImages(executorSupplier, doc, root);
         break;
       case BOTH:
         saveLinks(doc, root);
-        saveImages(nbThreads, doc, root);
+        saveImages(executorSupplier, doc, root);
         break;
     }
   }
@@ -103,7 +113,7 @@ public class Main {
     Printer.print("%d links were treated", links.size());
   }
 
-  private static void saveImages(int nbThreads, Document doc, File root) {
+  private static void saveImages(Supplier<ExecutorService> executorSupplier, Document doc, File root) {
     Elements media = doc.select("[src]");
     List<URL> imagesLinks = media.stream()
         .filter(e -> e.tagName().equals("img"))
@@ -119,7 +129,8 @@ public class Main {
         .filter(Objects::nonNull)
         .collect(Collectors.toList());
 
-    UrlImagesSaver imagesSaver = new UrlImagesSaver(nbThreads, root);
+
+    UrlImagesSaver imagesSaver = new UrlImagesSaver(executorSupplier.get(), root);
     Map<Integer, Integer> result = imagesSaver.saveImages(imagesLinks);
 
     int total = result.getOrDefault(UrlImagesSaver.OK, 0)
@@ -130,7 +141,8 @@ public class Main {
       Printer.print("All images were saved successfully (%d images)", total);
     } else {
       Printer.print("Out of %d images:", imagesLinks.size());
-      printNonNullResult("%d images were saved successfully", result.getOrDefault(UrlImagesSaver.OK, 0));
+      printNonNullResult("%d images were saved successfully",
+          result.getOrDefault(UrlImagesSaver.OK, 0));
       printNonNullResult("%d images were not saved due to a file creation error",
           result.getOrDefault(UrlImagesSaver.FILE_CREATION_ERROR, 0));
       printNonNullResult("%d images were not saved due to an error while saving",
