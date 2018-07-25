@@ -4,12 +4,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
 
-public class ExecutorSupplier implements Supplier<ExecutorService> {
+public class LazyExecutorSupplier implements Supplier<ExecutorService> {
 
   private final int nbThreads;
   private ExecutorService executor = null;
 
-  public ExecutorSupplier(int nbThreads) {
+  public LazyExecutorSupplier(int nbThreads) {
     this.nbThreads = nbThreads;
   }
 

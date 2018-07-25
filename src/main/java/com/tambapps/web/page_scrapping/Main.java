@@ -6,7 +6,7 @@ import com.tambapps.web.page_scrapping.parameters.Arguments;
 import com.tambapps.web.page_scrapping.parameters.ScrappingType;
 import com.tambapps.web.page_scrapping.printing.Logger;
 import com.tambapps.web.page_scrapping.saver.UrlImagesSaver;
-import com.tambapps.web.page_scrapping.util.ExecutorSupplier;
+import com.tambapps.web.page_scrapping.util.LazyExecutorSupplier;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -56,14 +56,14 @@ public class Main {
       return;
     }
 
-    ExecutorSupplier executorSupplier = new ExecutorSupplier(arguments.getNbThreads());
+    LazyExecutorSupplier lazyExecutorSupplier = new LazyExecutorSupplier(arguments.getNbThreads());
 
     for (String url : arguments.getUrls()) {
-      scrapUrl(executorSupplier, url, arguments.getType(), directory);
+      scrapUrl(lazyExecutorSupplier, url, arguments.getType(), directory);
     }
 
-    if (executorSupplier.wasSupplied()) {
-      executorSupplier.get().shutdown();
+    if (lazyExecutorSupplier.wasSupplied()) {
+      lazyExecutorSupplier.get().shutdown();
     }
     Logger.stop();
   }
