@@ -1,6 +1,6 @@
 package com.tambapps.web.page_scrapping.saver;
 
-import com.tambapps.web.page_scrapping.printing.Printer;
+import com.tambapps.web.page_scrapping.printing.Logger;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -40,7 +40,7 @@ public class UrlImagesSaver {
       try {
         returnCode = executorService.take().get();
       } catch (InterruptedException | ExecutionException e) {
-        Printer.verbose("Error while attempting to get result from image saving task: %s",
+        Logger.verbose("Error while attempting to get result from image saving task: %s",
             e.getMessage());
         continue;
       }
@@ -63,11 +63,11 @@ public class UrlImagesSaver {
       try {
         if (!file.createNewFile()) {
           IOException exception = new IOException("Unknown error");
-          Printer.verbose("Couldn't create new file: %s", exception.getMessage());
+          Logger.verbose("Couldn't create new file: %s", exception.getMessage());
           throw exception;
         }
       } catch (IOException e) {
-        Printer.verbose("Couldn't create new file: %s", e.getMessage());
+        Logger.verbose("Couldn't create new file: %s", e.getMessage());
         return FILE_CREATION_ERROR;
       }
       try (InputStream in = new BufferedInputStream(url.openStream());
@@ -78,7 +78,7 @@ public class UrlImagesSaver {
           out.write(buf, 0, n);
         }
       } catch (IOException e) {
-        Printer.verbose("Couldn't save image: %s", e.getMessage());
+        Logger.verbose("Couldn't save image: %s", e.getMessage());
         return SAVING_ERROR;
       }
       return OK;

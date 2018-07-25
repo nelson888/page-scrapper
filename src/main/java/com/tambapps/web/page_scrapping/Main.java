@@ -4,7 +4,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.tambapps.web.page_scrapping.parameters.Arguments;
 import com.tambapps.web.page_scrapping.parameters.ScrappingType;
-import com.tambapps.web.page_scrapping.printing.Printer;
+import com.tambapps.web.page_scrapping.printing.Logger;
 import com.tambapps.web.page_scrapping.saver.UrlImagesSaver;
 import com.tambapps.web.page_scrapping.util.ExecutorSupplier;
 import org.jsoup.HttpStatusException;
@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 public class Main {
   
   public static void main(String[] args) {
+    Logger.start();
     Arguments arguments = new Arguments();
 
     JCommander jCommander = JCommander.newBuilder()
@@ -35,20 +36,20 @@ public class Main {
     try {
       jCommander.parse(args);
     } catch (ParameterException e) {
-      System.out.println("Error: " + e.getMessage());
+      Logger.log("Error: %s", e.getMessage());
       jCommander.usage();
       return;
     }
 
-    Printer.setVerboseEnabled(arguments.isVerboseEnabled());
+    Logger.setVerboseEnabled(arguments.isVerboseEnabled());
 
     File directory = new File(arguments.getDirectory());
     if (!directory.exists() && !directory.mkdir()) {
-      Printer.print("Error: Couldn't create directory");
+      Logger.log("Error: Couldn't create directory");
       return;
     }
     if (!directory.isDirectory()) {
-      System.out.println("This isn't a directory: " + arguments.getDirectory());
+      Logger.log("This isn't a directory: %s", arguments.getDirectory());
       return;
     }
 
@@ -61,6 +62,7 @@ public class Main {
     if (executorSupplier.wasSupplied()) {
       executorSupplier.get().shutdown();
     }
+    Logger.stop();
   }
 
   private static void scrapUrl(Supplier<ExecutorService> executorSupplier, String url,
@@ -69,10 +71,10 @@ public class Main {
     try {
       doc = Jsoup.connect(url).get();
     } catch (HttpStatusException e) {
-      Printer.print("Error while connecting to url %s: Status Code: %d", url, e.getStatusCode());
+      Logger.log("Error while connecting to url %s: Status Code: %d", url, e.getStatusCode());
       return;
     } catch (IOException e) {
-      Printer.print("Error while connecting to url %s: %s", url, e.getMessage());
+      Logger.log("Error while connecting to url %s: %s", url, e.getMessage());
       return;
     }
     switch (type) {
@@ -104,13 +106,12 @@ public class Main {
         }
       }
       if (lineError) {
-        Printer.print("Some links couldn't be written");
+        Logger.log("Some links couldn't be written");
       }
     } catch (IOException e) {
-      Printer.print("An error occured wile attempting to write: %s", e.getMessage());
+      Logger.log("An error occured wile attempting to write: %s", e.getMessage());
     }
-
-    Printer.print("%d links were treated", links.size());
+    Logger.log("%d links were treated", links.size());
   }
 
   private static void saveImages(Supplier<ExecutorService> executorSupplier, Document doc, File root) {
@@ -122,7 +123,7 @@ public class Main {
           try {
             return new URL(url);
           } catch (MalformedURLException exception) {
-            Printer.print("Couldn't resolve url %s", url);
+            Logger.log("Couldn't resolve url %s", url);
             return null;
           }
         })
@@ -138,9 +139,9 @@ public class Main {
         + result.getOrDefault(UrlImagesSaver.SAVING_ERROR, 0);
 
     if (Objects.equals(total, result.get(UrlImagesSaver.OK))) {
-      Printer.print("All images were saved successfully (%d images)", total);
+      Logger.log("All images were saved successfully (%d images)", total);
     } else {
-      Printer.print("Out of %d images:", imagesLinks.size());
+      Logger.log("Out of %d images:", imagesLinks.size());
       printNonNullResult("%d images were saved successfully",
           result.getOrDefault(UrlImagesSaver.OK, 0));
       printNonNullResult("%d images were not saved due to a file creation error",
@@ -152,7 +153,7 @@ public class Main {
 
   private static void printNonNullResult(String message, int result) {
     if (result > 0) {
-      Printer.print(message, result);
+      Logger.log(message, result);
     }
   }
 
