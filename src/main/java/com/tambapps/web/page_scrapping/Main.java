@@ -38,6 +38,7 @@ public class Main {
     } catch (ParameterException e) {
       Logger.log("Error: %s", e.getMessage());
       jCommander.usage();
+      Logger.stop();
       return;
     }
 
@@ -46,10 +47,12 @@ public class Main {
     File directory = new File(arguments.getDirectory());
     if (!directory.exists() && !directory.mkdir()) {
       Logger.log("Error: Couldn't create directory");
+      Logger.stop();
       return;
     }
     if (!directory.isDirectory()) {
       Logger.log("This isn't a directory: %s", arguments.getDirectory());
+      Logger.stop();
       return;
     }
 
