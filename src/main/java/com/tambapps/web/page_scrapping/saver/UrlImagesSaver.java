@@ -36,11 +36,12 @@ public class UrlImagesSaver {
 
     HashMap<Integer, Integer> outputTasks = new HashMap<>();
     for (int i = 0; i < urls.size(); i++) {
-      int returnCode = 0;
+      int returnCode;
       try {
         returnCode = executorService.take().get();
       } catch (InterruptedException | ExecutionException e) {
-        Printer.verbose("Error: %s", e);
+        Printer.verbose("Error while attempting to get result from image saving task: %s",
+            e.getMessage());
         continue;
       }
       outputTasks.put(returnCode, outputTasks.getOrDefault(returnCode, 0) + 1);
@@ -61,7 +62,9 @@ public class UrlImagesSaver {
       File file = getAvailableFile(directory, getFileName(url));
       try {
         if (!file.createNewFile()) {
-          throw new IOException("Unknown error");
+          IOException exception = new IOException("Unknown error");
+          Printer.verbose("Couldn't create new file: %s", exception.getMessage());
+          throw exception;
         }
       } catch (IOException e) {
         Printer.verbose("Couldn't create new file: %s", e.getMessage());
@@ -75,6 +78,7 @@ public class UrlImagesSaver {
           out.write(buf, 0, n);
         }
       } catch (IOException e) {
+        Printer.verbose("Couldn't save image: %s", e.getMessage());
         return SAVING_ERROR;
       }
       return OK;
