@@ -25,9 +25,14 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class Main {
-  
+
   public static void main(String[] args) {
     Logger.start();
+    run(args);
+    Logger.stop();
+  }
+
+  private static void run(String[] args) {
     Arguments arguments = new Arguments();
 
     JCommander jCommander = JCommander.newBuilder()
@@ -38,7 +43,6 @@ public class Main {
     } catch (ParameterException e) {
       Logger.log("Error: %s", e.getMessage());
       jCommander.usage();
-      Logger.stop();
       return;
     }
 
@@ -47,12 +51,10 @@ public class Main {
     File directory = new File(arguments.getDirectory());
     if (!directory.exists() && !directory.mkdir()) {
       Logger.log("Error: Couldn't create directory");
-      Logger.stop();
       return;
     }
     if (!directory.isDirectory()) {
       Logger.log("This isn't a directory: %s", arguments.getDirectory());
-      Logger.stop();
       return;
     }
 
@@ -65,7 +67,6 @@ public class Main {
     if (lazyExecutorSupplier.wasSupplied()) {
       lazyExecutorSupplier.get().shutdown();
     }
-    Logger.stop();
   }
 
   private static void scrapUrl(Supplier<ExecutorService> executorSupplier, String url,
