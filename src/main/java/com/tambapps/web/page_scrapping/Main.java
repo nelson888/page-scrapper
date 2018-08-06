@@ -4,7 +4,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.tambapps.web.page_scrapping.parameters.Arguments;
 import com.tambapps.web.page_scrapping.parameters.ScrappingType;
-import com.tambapps.web.page_scrapping.printing.Logger;
+import com.tambapps.web.page_scrapping.printing.Printer;
 import com.tambapps.web.page_scrapping.saver.UrlImagesSaver;
 import com.tambapps.web.page_scrapping.util.LazyExecutorSupplier;
 import org.jsoup.HttpStatusException;
@@ -27,9 +27,9 @@ import java.util.stream.Collectors;
 public class Main {
 
   public static void main(String[] args) {
-    Logger.start();
+    Printer.start();
     run(args);
-    Logger.stop();
+    Printer.stop();
   }
 
   private static void run(String[] args) {
@@ -41,20 +41,20 @@ public class Main {
     try {
       jCommander.parse(args);
     } catch (ParameterException e) {
-      Logger.log("Error: %s", e.getMessage());
+      Printer.log("Error: %s", e.getMessage());
       jCommander.usage();
       return;
     }
 
-    Logger.setVerboseEnabled(arguments.isVerboseEnabled());
+    Printer.setVerboseEnabled(arguments.isVerboseEnabled());
 
     File directory = new File(arguments.getDirectory());
     if (!directory.exists() && !directory.mkdir()) {
-      Logger.log("Error: Couldn't create directory");
+      Printer.log("Error: Couldn't create directory");
       return;
     }
     if (!directory.isDirectory()) {
-      Logger.log("This isn't a directory: %s", arguments.getDirectory());
+      Printer.log("This isn't a directory: %s", arguments.getDirectory());
       return;
     }
 
@@ -75,10 +75,10 @@ public class Main {
     try {
       doc = Jsoup.connect(url).get();
     } catch (HttpStatusException e) {
-      Logger.log("Error while connecting to url %s: Status Code: %d", url, e.getStatusCode());
+      Printer.log("Error while connecting to url %s: Status Code: %d", url, e.getStatusCode());
       return;
     } catch (IOException e) {
-      Logger.log("Error while connecting to url %s: %s", url, e.getMessage());
+      Printer.log("Error while connecting to url %s: %s", url, e.getMessage());
       return;
     }
     switch (type) {
@@ -110,12 +110,12 @@ public class Main {
         }
       }
       if (lineError) {
-        Logger.log("Some links couldn't be written");
+        Printer.log("Some links couldn't be written");
       }
     } catch (IOException e) {
-      Logger.log("An error occured wile attempting to write: %s", e.getMessage());
+      Printer.log("An error occured wile attempting to write: %s", e.getMessage());
     }
-    Logger.log("%d links were treated", links.size());
+    Printer.log("%d links were treated", links.size());
   }
 
   private static void saveImages(Supplier<ExecutorService> executorSupplier, Document doc, File root) {
@@ -127,7 +127,7 @@ public class Main {
           try {
             return new URL(url);
           } catch (MalformedURLException exception) {
-            Logger.log("Couldn't resolve url %s", url);
+            Printer.log("Couldn't resolve url %s", url);
             return null;
           }
         })
@@ -143,9 +143,9 @@ public class Main {
         + result.getOrDefault(UrlImagesSaver.SAVING_ERROR, 0);
 
     if (Objects.equals(total, result.get(UrlImagesSaver.OK))) {
-      Logger.log("All images were saved successfully (%d images)", total);
+      Printer.log("All images were saved successfully (%d images)", total);
     } else {
-      Logger.log("Out of %d images:", imagesLinks.size());
+      Printer.log("Out of %d images:", imagesLinks.size());
       printNonNullResult("%d images were saved successfully",
           result.getOrDefault(UrlImagesSaver.OK, 0));
       printNonNullResult("%d images were not saved due to a file creation error",
@@ -157,7 +157,7 @@ public class Main {
 
   private static void printNonNullResult(String message, int result) {
     if (result > 0) {
-      Logger.log(message, result);
+      Printer.log(message, result);
     }
   }
 

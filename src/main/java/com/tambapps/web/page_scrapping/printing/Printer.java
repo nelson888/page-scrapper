@@ -3,7 +3,7 @@ package com.tambapps.web.page_scrapping.printing;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
-public class Logger {
+public class Printer {
 
   private static boolean verboseEnabled;
   private static final BlockingQueue<String> LOGS_QUEUE = new LinkedBlockingDeque<>();
@@ -32,7 +32,7 @@ public class Logger {
   }
 
   public static void setVerboseEnabled(boolean verboseEnabled) {
-    Logger.verboseEnabled = verboseEnabled;
+    Printer.verboseEnabled = verboseEnabled;
   }
 
   public static void start() {
