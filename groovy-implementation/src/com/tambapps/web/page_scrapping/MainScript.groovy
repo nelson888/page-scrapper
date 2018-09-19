@@ -2,9 +2,9 @@ package com.tambapps.web.page_scrapping
 
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.ParameterException
-import com.tambapps.web.page_scrapping.extractor.ImageSaver
-import com.tambapps.web.page_scrapping.extractor.LinkSaver
-import com.tambapps.web.page_scrapping.extractor.Saver
+import com.tambapps.web.page_scrapping.saver.ImageSaver
+import com.tambapps.web.page_scrapping.saver.LinkSaver
+import com.tambapps.web.page_scrapping.saver.Saver
 import com.tambapps.web.page_scrapping.parameter.Args
 import com.tambapps.web.page_scrapping.parameter.ScrapingType
 import com.tambapps.web.page_scrapping.util.Printer

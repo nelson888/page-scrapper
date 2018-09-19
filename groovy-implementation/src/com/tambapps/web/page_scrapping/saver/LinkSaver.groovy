@@ -1,4 +1,4 @@
-package com.tambapps.web.page_scrapping.extractor
+package com.tambapps.web.page_scrapping.saver
 
 import com.tambapps.web.page_scrapping.util.Printer
 import groovy.util.slurpersupport.NodeChild
