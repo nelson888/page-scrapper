@@ -13,7 +13,7 @@ class Args {
     static final Character COLLECTION_SEPARATOR = ',' //TODO treat list and set
 
     @Parameter(names = '-urls', description = 'url(s) to scrap',
-            validateWith = NotEmptyCollection,required = true)
+            validateWith = NotEmptyCollection, required = true)
     List<String> urls
 
     @Parameter(names = ['-dir', '--directory'], converter = FileConverter,

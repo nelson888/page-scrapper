@@ -36,7 +36,7 @@ class ImageSaver extends AbstractSaver {
             File file = getAvailableFile(getFileName(url))
             try {
                 Files.copy(url.openStream(), file.toPath())
-            } catch(IOException e) {
+            } catch (IOException e) {
                 returnCode = 2
                 errorsMap.put(returnCode, errorsMap.getOrDefault(returnCode, 0) + 1)
                 return returnCode

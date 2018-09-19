@@ -10,7 +10,7 @@ import com.tambapps.web.page_scrapping.parameter.ScrapingType
 import com.tambapps.web.page_scrapping.util.Printer
 import groovy.util.slurpersupport.NodeChild
 
-@Grab(group='net.sourceforge.nekohtml', module='nekohtml', version='1.9.14')
+@Grab(group = 'net.sourceforge.nekohtml', module = 'nekohtml', version = '1.9.14')
 import org.cyberneko.html.parsers.SAXParser as HtmlParser
 
 import java.util.concurrent.Executor
@@ -33,7 +33,7 @@ Executor executor = Executors.newFixedThreadPool(arguments.nbThreads)
 List<Saver> savers = arguments.type.collect { return getSaver(it, executor, dir) }
 XmlSlurper slurper = new XmlSlurper(new HtmlParser())
 String typesUsed = arguments.type*.name()*.toLowerCase().stream().reduce({
-    s1,s2 -> s1 + ', ' + s2
+    s1, s2 -> s1 + ', ' + s2
 }).get()
 Printer.print("About to save $typesUsed")
 for (String url : arguments.urls) {
@@ -49,6 +49,7 @@ executor.shutdownNow()
 /*
  functions
  */
+
 Saver getSaver(ScrapingType type, Executor executor, File dir) {
     switch (type) {
         case ScrapingType.LINKS:

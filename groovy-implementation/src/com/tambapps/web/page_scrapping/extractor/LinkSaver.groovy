@@ -26,7 +26,7 @@ class LinkSaver extends AbstractSaver {
                 try {
                     String link = linksQueue.take()
                     file << (link + '\n')
-                } catch(InterruptedException e) {
+                } catch (InterruptedException e) {
                     running = false
                 }
             }
