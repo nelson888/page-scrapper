@@ -9,17 +9,16 @@ import java.util.concurrent.LinkedBlockingQueue
 
 class LinkSaver extends AbstractSaver {
 
-    private final File file
     private final BlockingQueue<String> linksQueue = new LinkedBlockingQueue<>()
-    private int nbLinks
+    private final String fileName
 
     LinkSaver(Executor executor, File dir) {
         super(executor, dir, 'a')
-        nbLinks = 0
-        file = getAvailableFile('links.txt')
+        File file = getAvailableFile('links.txt')
         if (!file.createNewFile()) {
             throw new RuntimeException('Couldn\'t create file')
         }
+        fileName = file.getName()
         executorService.submit({
             boolean running = true
             while (running) {
@@ -47,6 +46,7 @@ class LinkSaver extends AbstractSaver {
 
     @Override
     void printResult() {
+        Printer.print("links were saved in $fileName")
         Printer.print("$treatedCount links were treated")
     }
 }

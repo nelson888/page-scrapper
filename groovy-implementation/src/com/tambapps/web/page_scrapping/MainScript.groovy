@@ -16,7 +16,6 @@ import org.cyberneko.html.parsers.SAXParser as HtmlParser
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
-
 Args arguments = new Args()
 JCommander jCommander = JCommander.newInstance(arguments)
 
@@ -30,9 +29,9 @@ Printer.setVerbose(arguments.verbose)
 File dir = arguments.directory
 Executor executor = Executors.newFixedThreadPool(arguments.nbThreads)
 
-List<Saver> savers = arguments.type.collect { return getSaver(it, executor, dir) }
+List<Saver> savers = arguments.types.collect { return getSaver(it, executor, dir) }
 XmlSlurper slurper = new XmlSlurper(new HtmlParser())
-String typesUsed = arguments.type*.name()*.toLowerCase().stream().reduce({
+String typesUsed = arguments.types.stream().map({ it.name().toLowerCase() }).reduce({
     s1, s2 -> s1 + ', ' + s2
 }).get()
 Printer.print("About to save $typesUsed")
@@ -40,7 +39,6 @@ for (String url : arguments.urls) {
     Printer.print('\n')
     scrapUrl(slurper, url, savers)
 }
-
 
 savers*.printResult()
 
@@ -64,7 +62,13 @@ Saver getSaver(ScrapingType type, Executor executor, File dir) {
 void scrapUrl(XmlSlurper slurper, String url, List<Saver> savers) {
     Printer.print("Processing url $url")
 
-    def page = slurper.parse(url)
+    def page
+    try {
+        page = slurper.parse(url)
+    } catch(IOException e) {
+        Printer.print("Error while accessing this url. Skipping it")
+        return
+    }
 
     for (NodeChild node : page.breadthFirst()) {
         savers.forEach {
