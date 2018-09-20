@@ -25,7 +25,7 @@ public class Printer {
 
   public static void start(Executor executor, boolean verboseEnabled) {
     Printer.verboseEnabled = verboseEnabled;
-    executor.execute(()  -> {
+    executor.execute(() -> {
       while (true) {
         try {
           System.out.println(LOGS_QUEUE.take());

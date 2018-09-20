@@ -31,7 +31,7 @@ public class LinkSaver extends AbstractSaver {
 
     FileWriter writer;
     try {
-       writer = new FileWriter(file);
+      writer = new FileWriter(file);
     } catch (IOException e) {
       throw new RuntimeException("Couldn\'t instanciate file writer");
     }

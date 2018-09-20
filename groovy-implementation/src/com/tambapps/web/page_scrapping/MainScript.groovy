@@ -41,7 +41,7 @@ for (String url : arguments.urls) {
     scrapUrl(slurper, url, savers)
 }
 
-savers.each ({
+savers.each({
     Printer.newLine()
     it.printResult()
 })
@@ -68,7 +68,7 @@ void scrapUrl(XmlSlurper slurper, String url, Set<Saver> savers) {
     def page
     try {
         page = slurper.parse(url)
-    } catch(IOException e) {
+    } catch (IOException e) {
         Printer.print("Error while accessing this url. Skipping it")
         return
     }

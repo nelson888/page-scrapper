@@ -21,8 +21,8 @@ public class ScrapingTypeConverter implements IStringConverter<Set<ScrapingType>
   private ScrapingType toType(String t) {
     try {
       return ScrapingType.valueOf(t.toUpperCase());
-    } catch(IllegalArgumentException e) {
-      throw new ParameterException( t + " is not a valid type", e);
+    } catch (IllegalArgumentException e) {
+      throw new ParameterException(t + " is not a valid type", e);
     }
   }
 

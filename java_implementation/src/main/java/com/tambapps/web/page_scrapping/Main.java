@@ -73,7 +73,7 @@ public class Main {
     } catch (HttpStatusException e) {
       Printer.print("Error while connecting to url %s: Status Code: %d", url, e.getStatusCode());
       return;
-    } catch (IOException|IllegalArgumentException e) {
+    } catch (IOException | IllegalArgumentException e) {
       Printer.print("Error while connecting to url %s: %s", url, e.getMessage());
       return;
     }

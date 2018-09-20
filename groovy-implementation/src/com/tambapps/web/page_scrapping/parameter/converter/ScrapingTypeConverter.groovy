@@ -9,19 +9,19 @@ import java.util.stream.Collectors
 
 class ScrapingTypeConverter implements IStringConverter<Set<ScrapingType>> {
 
-  @Override
-  Set<ScrapingType> convert(String value) {
-    return Arrays.stream(value.split(Args.COLLECTION_SEPARATOR))
-            .map({ toType(it) })
-            .collect(Collectors.toSet())
-  }
-
-  private ScrapingType toType(String t) {
-    try {
-      return ScrapingType.valueOf(t.toUpperCase())
-    } catch(IllegalArgumentException e) {
-      throw new ParameterException("$t is not a valid types", e)
+    @Override
+    Set<ScrapingType> convert(String value) {
+        return Arrays.stream(value.split(Args.COLLECTION_SEPARATOR))
+                .map({ toType(it) })
+                .collect(Collectors.toSet())
     }
-  }
+
+    private ScrapingType toType(String t) {
+        try {
+            return ScrapingType.valueOf(t.toUpperCase())
+        } catch (IllegalArgumentException e) {
+            throw new ParameterException("$t is not a valid types", e)
+        }
+    }
 
 }
