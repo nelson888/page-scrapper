@@ -73,14 +73,6 @@ public abstract class FileSaver extends AbstractSaver {
 
   abstract String processData(Element element);
 
-  String getFileName() {
-    return fileName;
-  }
-
-  int getFailCount() {
-    return failCount;
-  }
-
   @Override
   public void finish() {
     textQueue.add(END);
@@ -97,9 +89,9 @@ public abstract class FileSaver extends AbstractSaver {
 
   @Override
   public void printResult() {
-    Printer.print("The %ss were saved in %s", dataName, getFileName());
+    Printer.print("The %ss were saved in %s", dataName, fileName);
     Printer.print("%d %ss were treated", getTreatedCount(), dataName);
-    if (getFailCount() > 0) {
+    if (failCount > 0) {
       Printer.print("$failCount %ss couldn't be saved", dataName);
     }
   }
