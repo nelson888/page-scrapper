@@ -14,6 +14,7 @@ import groovy.util.slurpersupport.NodeChild
 import org.cyberneko.html.parsers.SAXParser as HtmlParser
 
 import java.util.concurrent.Executor
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 Args arguments = new Args()
@@ -25,29 +26,31 @@ try {
     println e.message
     return
 }
-Printer.setVerbose(arguments.verbose)
+ExecutorService executor = Executors.newFixedThreadPool(arguments.nbThreads)
+Printer.start(executor, arguments.verbose)
 File dir = arguments.directory
-Executor executor = Executors.newFixedThreadPool(arguments.nbThreads)
 
-List<Saver> savers = arguments.types.collect { return getSaver(it, executor, dir) }
+Set<Saver> savers = arguments.types.collect { return getSaver(it, executor, dir) }.toSet()
 XmlSlurper slurper = new XmlSlurper(new HtmlParser())
 String typesUsed = arguments.types.stream().map({ it.name().toLowerCase() }).reduce({
     s1, s2 -> s1 + ', ' + s2
 }).get()
 Printer.print("About to save $typesUsed")
 for (String url : arguments.urls) {
-    Printer.print('\n')
+    Printer.newLine()
     scrapUrl(slurper, url, savers)
 }
 
-savers*.printResult()
+savers.each ({
+    Printer.newLine()
+    it.printResult()
+})
 
 executor.shutdownNow()
 
 /*
  functions
  */
-
 Saver getSaver(ScrapingType type, Executor executor, File dir) {
     switch (type) {
         case ScrapingType.LINKS:
@@ -59,7 +62,7 @@ Saver getSaver(ScrapingType type, Executor executor, File dir) {
     }
 }
 
-void scrapUrl(XmlSlurper slurper, String url, List<Saver> savers) {
+void scrapUrl(XmlSlurper slurper, String url, Set<Saver> savers) {
     Printer.print("Processing url $url")
 
     def page

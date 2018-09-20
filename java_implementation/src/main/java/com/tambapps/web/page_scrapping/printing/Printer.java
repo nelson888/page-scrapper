@@ -1,47 +1,39 @@
 package com.tambapps.web.page_scrapping.printing;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingDeque;
 
 public class Printer {
 
   private static final BlockingQueue<String> LOGS_QUEUE = new LinkedBlockingDeque<>();
-  private static final Thread LOGGING_THREAD = new Thread(new Runnable() {
-    private boolean interrupted = false;
-
-    @Override
-    public void run() {
-      while (!interrupted) {
-        try {
-          System.out.println(LOGS_QUEUE.take());
-        } catch (InterruptedException e) {
-          interrupted = true;
-        }
-      }
-    }
-  });
   private static boolean verboseEnabled;
 
-  public static void log(String s, Object... args) {
+  public static void print(String s, Object... args) {
     LOGS_QUEUE.add(String.format(s, args));
   }
 
   public static void verbose(String s, Object... args) {
     if (verboseEnabled) {
-      log(s, args);
+      print(s, args);
     }
   }
 
-  public static void setVerboseEnabled(boolean verboseEnabled) {
+  public static void newLine() {
+    print("");
+  }
+
+  public static void start(Executor executor, boolean verboseEnabled) {
     Printer.verboseEnabled = verboseEnabled;
-  }
-
-  public static void start() {
-    LOGGING_THREAD.start();
-  }
-
-  public static void stop() {
-    LOGGING_THREAD.interrupt();
+    executor.execute(()  -> {
+      while (true) {
+        try {
+          System.out.println(LOGS_QUEUE.take());
+        } catch (InterruptedException e) {
+          return;
+        }
+      }
+    });
   }
 
 }

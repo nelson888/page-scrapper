@@ -58,7 +58,7 @@ public class LinkSaver extends AbstractSaver {
     String link = element.attributes().get("href");
     if (!link.trim().isEmpty() && !link.startsWith("#")) {
       linksQueue.add(link);
-      Printer.log("Found link %s", link);
+      Printer.print("Found link %s", link);
       return true;
     }
     return false;
@@ -66,10 +66,10 @@ public class LinkSaver extends AbstractSaver {
 
   @Override
   public void printResult() {
-    Printer.log("links were saved in ", fileName);
-    Printer.log("%d links were treated", getTreatedCount());
+    Printer.print("The links were saved in %s", fileName);
+    Printer.print("%d links were treated", getTreatedCount());
     if (failCount > 0) {
-      Printer.log("%d links couldn't be saved", failCount);
+      Printer.print("%d links couldn't be saved", failCount);
     }
   }
 }

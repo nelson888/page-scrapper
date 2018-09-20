@@ -30,6 +30,7 @@ class ImageSaver extends AbstractSaver {
                 url = new URL(link)
             } catch (MalformedURLException e) {
                 returnCode = 1
+                Printer.verbose("Error while loading image: URL $link is malformed")
                 errorsMap.put(returnCode, errorsMap.getOrDefault(returnCode, 0) + 1)
                 return returnCode
             }
@@ -38,6 +39,7 @@ class ImageSaver extends AbstractSaver {
                 Files.copy(url.openStream(), file.toPath())
             } catch (IOException e) {
                 returnCode = 2
+                Printer.verbose("Error while loading image: $e.message")
                 errorsMap.put(returnCode, errorsMap.getOrDefault(returnCode, 0) + 1)
                 return returnCode
             }

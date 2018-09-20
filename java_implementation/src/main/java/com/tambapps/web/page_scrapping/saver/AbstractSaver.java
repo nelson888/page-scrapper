@@ -49,7 +49,7 @@ abstract class AbstractSaver implements Saver {
     return file;
   }
 
-  protected int getTreatedCount() {
+  int getTreatedCount() {
     return treatedCount;
   }
 }

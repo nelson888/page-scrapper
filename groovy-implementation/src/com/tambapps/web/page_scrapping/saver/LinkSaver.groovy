@@ -11,25 +11,30 @@ class LinkSaver extends AbstractSaver {
 
     private final BlockingQueue<String> linksQueue = new LinkedBlockingQueue<>()
     private final String fileName
+    private int failCount = 0
 
     LinkSaver(Executor executor, File dir) {
         super(executor, dir, 'a')
         File file = getAvailableFile('links.txt')
+        fileName = file.getName()
         if (!file.createNewFile()) {
             throw new RuntimeException('Couldn\'t create file')
         }
-        fileName = file.getName()
         executorService.submit({
-            boolean running = true
-            while (running) {
+            while (true) {
+                String link
                 try {
-                    String link = linksQueue.take()
-                    file << (link + '\n')
+                    link = linksQueue.take()
                 } catch (InterruptedException e) {
-                    running = false
+                    return 0
+                }
+                try {
+                    file << (link + '\n')
+                } catch (IOException e) {
+                    Printer.verbose("Error while writing link $link: $e.message")
+                    failCount++
                 }
             }
-            return 0
         })
     }
 
@@ -46,7 +51,11 @@ class LinkSaver extends AbstractSaver {
 
     @Override
     void printResult() {
-        Printer.print("links were saved in $fileName")
+        Printer.print("The links were saved in $fileName")
         Printer.print("$treatedCount links were treated")
+        Printer.print("$treatedCount links were treated");
+        if (failCount > 0) {
+            Printer.print("$failCount links couldn't be saved");
+        }
     }
 }

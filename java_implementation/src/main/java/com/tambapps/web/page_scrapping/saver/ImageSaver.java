@@ -59,9 +59,9 @@ public class ImageSaver extends AbstractSaver {
 
   @Override
   public void printResult() {
-    Printer.log("%d images were treated", getTreatedCount());
+    Printer.print("%d images were treated", getTreatedCount());
     if (errorsMap.keySet().isEmpty()) {
-      Printer.log("no error were encountered");
+      Printer.print("no error were encountered");
     } else {
       for (Integer errorCode : errorsMap.keySet()) {
         printError(errorCode);
@@ -81,7 +81,7 @@ public class ImageSaver extends AbstractSaver {
         error = "error while writing image";
     }
     if (count > 0) {
-      Printer.log("%d images couldn't be treated due to an %s", count, error);
+      Printer.print("%d images couldn't be treated due to an %s", count, error);
     }
   }
 

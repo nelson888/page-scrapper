@@ -17,7 +17,7 @@ public class Arguments {
 
   public static final String COLLECTION_SEPARATOR = ",";
 
-  @Parameter(description = "url(s) to scrap", required = true,
+  @Parameter(names = "-urls", description = "url(s) to scrap", required = true,
       validateWith = NotEmptyCollection.class)
   private List<String> urls;
 
