@@ -21,7 +21,7 @@ abstract class AbstractSaver implements Saver {
 
   @Override
   public void processElement(Element element) {
-    if (tag.equalsIgnoreCase(element.tagName())) {
+    if (ANY == tag || tag.equalsIgnoreCase(element.tagName())) {
       if (process(element)) {
         treatedCount++;
       }

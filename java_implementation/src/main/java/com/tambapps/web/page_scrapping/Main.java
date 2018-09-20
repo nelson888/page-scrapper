@@ -5,7 +5,8 @@ import com.beust.jcommander.ParameterException;
 
 import com.tambapps.web.page_scrapping.parameters.Arguments;
 import com.tambapps.web.page_scrapping.parameters.ScrapingType;
-import com.tambapps.web.page_scrapping.printing.Printer;
+import com.tambapps.web.page_scrapping.saver.TextSaver;
+import com.tambapps.web.page_scrapping.util.Printer;
 import com.tambapps.web.page_scrapping.saver.ImageSaver;
 import com.tambapps.web.page_scrapping.saver.LinkSaver;
 import com.tambapps.web.page_scrapping.saver.Saver;
@@ -60,6 +61,7 @@ public class Main {
 
     for (Saver saver : savers) {
       Printer.newLine();
+      saver.finish();
       saver.printResult();
     }
     executor.shutdownNow();
@@ -92,7 +94,7 @@ public class Main {
       case IMAGES:
         return new ImageSaver(executor, dir);
       case TEXT:
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new TextSaver(executor, dir);
     }
   }
 

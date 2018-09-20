@@ -4,8 +4,12 @@ import org.jsoup.nodes.Element;
 
 public interface Saver {
 
+  String ANY = "";
+
   void printResult();
 
   void processElement(Element element);
+
+  void finish();
 
 }

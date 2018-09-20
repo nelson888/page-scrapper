@@ -1,6 +1,6 @@
 package com.tambapps.web.page_scrapping.saver;
 
-import com.tambapps.web.page_scrapping.printing.Printer;
+import com.tambapps.web.page_scrapping.util.Printer;
 
 import org.jsoup.nodes.Element;
 
@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 
 public class ImageSaver extends AbstractSaver {
@@ -42,7 +43,6 @@ public class ImageSaver extends AbstractSaver {
         url = new URL(link);
       } catch (MalformedURLException e) {
         returnCode = 1;
-        errorsMap.put(returnCode, errorsMap.getOrDefault(returnCode, 0) + 1);
         return returnCode;
       }
       File file = getAvailableFile(getFileName(url));
@@ -50,7 +50,6 @@ public class ImageSaver extends AbstractSaver {
         Files.copy(url.openStream(), file.toPath());
       } catch (IOException e) {
         returnCode = 2;
-        errorsMap.put(returnCode, errorsMap.getOrDefault(returnCode, 0) + 1);
         return returnCode;
       }
       return returnCode;
@@ -64,24 +63,46 @@ public class ImageSaver extends AbstractSaver {
       Printer.print("no error were encountered");
     } else {
       for (Integer errorCode : errorsMap.keySet()) {
-        printError(errorCode);
+        if (errorCode != 0) {
+          printError(errorCode);
+        }
       }
     }
   }
 
   private void printError(int errorCode) {
-    int count = errorsMap.getOrDefault(errorCode, 0);
+    int count = errorsMap.getOrDefault(errorCode, 2);
     String error;
     switch (errorCode) {
       default:
       case 1:
-        error = "malformed url error";
+        error = "a malformed url error";
         break;
       case 2:
-        error = "error while writing image";
+        error = "an error while writing image";
+        break;
+      case 3:
+        error = "the interruption of the saving process";
+        break;
+
     }
     if (count > 0) {
-      Printer.print("%d images couldn't be treated due to an %s", count, error);
+      Printer.print("%d images couldn't be treated due to %s", count, error);
+    }
+  }
+
+  @Override
+  public void finish() {
+    for (int i = 0; i < getTreatedCount(); i++) {
+      int returnCode;
+      try {
+        returnCode = executorService.take().get();
+      } catch (InterruptedException e) {
+        returnCode = 3;
+      } catch (ExecutionException e) {
+        returnCode = 2;
+      }
+      errorsMap.put(returnCode, errorsMap.getOrDefault(returnCode, 0) + 1);
     }
   }
 

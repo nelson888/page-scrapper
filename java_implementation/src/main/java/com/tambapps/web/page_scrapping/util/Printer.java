@@ -1,4 +1,4 @@
-package com.tambapps.web.page_scrapping.printing;
+package com.tambapps.web.page_scrapping.util;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;

@@ -36,7 +36,7 @@ public class Arguments {
 
   @Parameter(names = {"-t", "--threads"},
       description = "How many threads should be used to process image saving tasks")
-  private int nbThreads = 3;
+  private int nbThreads = Runtime.getRuntime().availableProcessors() + 1;
 
 
   public List<String> getUrls() {
