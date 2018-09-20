@@ -7,6 +7,7 @@ import com.tambapps.web.page_scrapping.saver.LinkSaver
 import com.tambapps.web.page_scrapping.saver.Saver
 import com.tambapps.web.page_scrapping.parameter.Args
 import com.tambapps.web.page_scrapping.parameter.ScrapingType
+import com.tambapps.web.page_scrapping.saver.TextSaver
 import com.tambapps.web.page_scrapping.util.Printer
 import groovy.util.slurpersupport.NodeChild
 
@@ -36,6 +37,7 @@ String typesUsed = arguments.types.stream().map({ it.name().toLowerCase() }).red
     s1, s2 -> s1 + ', ' + s2
 }).get()
 Printer.print("About to save $typesUsed")
+
 for (String url : arguments.urls) {
     Printer.newLine()
     scrapUrl(slurper, url, savers)
@@ -43,6 +45,7 @@ for (String url : arguments.urls) {
 
 savers.each({
     Printer.newLine()
+    it.finish()
     it.printResult()
 })
 
@@ -58,7 +61,7 @@ Saver getSaver(ScrapingType type, Executor executor, File dir) {
         case ScrapingType.IMAGES:
             return new ImageSaver(executor, dir)
         case ScrapingType.TEXT:
-            throw new UnsupportedOperationException('Not implemented yet')
+            return new TextSaver(executor, dir)
     }
 }
 

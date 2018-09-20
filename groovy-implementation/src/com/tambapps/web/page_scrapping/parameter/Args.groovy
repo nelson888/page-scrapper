@@ -12,7 +12,7 @@ import com.tambapps.web.page_scrapping.parameter.validator.NotEmptyCollection
 @Parameters(separators = '=')
 class Args {
 
-    static final String COLLECTION_SEPARATOR = ',' //TODO treat list and set
+    static final String COLLECTION_SEPARATOR = ','
 
     @Parameter(names = '-urls', description = 'url(s) to scrap',
             validateWith = NotEmptyCollection, required = true)
@@ -33,6 +33,6 @@ class Args {
 
     @Parameter(names = ['-t', '--threads'], validateValueWith = NaturalInteger,
             description = 'How many threads should be used to process image saving tasks')
-    int nbThreads = 3
+    int nbThreads = Runtime.getRuntime().availableProcessors() + 1
 
 }

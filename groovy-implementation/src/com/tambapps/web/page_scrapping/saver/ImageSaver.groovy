@@ -21,7 +21,7 @@ class ImageSaver extends AbstractSaver {
         return true
     }
 
-    protected Callable<Integer> createTask(NodeChild element) {
+    private Callable<Integer> createTask(NodeChild element) {
         return {
             int returnCode = 0
             String link = element.attributes().get('src')
@@ -31,7 +31,6 @@ class ImageSaver extends AbstractSaver {
             } catch (MalformedURLException e) {
                 returnCode = 1
                 Printer.verbose("Error while loading image: URL $link is malformed")
-                errorsMap.put(returnCode, errorsMap.getOrDefault(returnCode, 0) + 1)
                 return returnCode
             }
             File file = getAvailableFile(getFileName(url))
@@ -40,7 +39,6 @@ class ImageSaver extends AbstractSaver {
             } catch (IOException e) {
                 returnCode = 2
                 Printer.verbose("Error while loading image: $e.message")
-                errorsMap.put(returnCode, errorsMap.getOrDefault(returnCode, 0) + 1)
                 return returnCode
             }
             return returnCode
@@ -69,14 +67,21 @@ class ImageSaver extends AbstractSaver {
         String error
         switch (errorCode) {
             case 1:
-                error = 'malformed url error'
+                error = 'a malformed url error'
                 break
             case 2:
-                error = 'error while writing image'
+                error = 'an error while writing image'
         }
         if (count > 0) {
-            Printer.print("$count images couldn't be treated due to an $error")
+            Printer.print("$count images couldn't be treated due to $error")
         }
     }
 
+    @Override
+    void finish() {
+        for (int i = 0; i < treatedCount; i++) {
+            int returnCode = executorService.take().get()
+            errorsMap.put(returnCode, errorsMap.getOrDefault(returnCode, 0) + 1)
+        }
+    }
 }

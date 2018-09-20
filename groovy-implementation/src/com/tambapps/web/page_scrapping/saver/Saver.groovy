@@ -4,8 +4,10 @@ import groovy.util.slurpersupport.NodeChild
 
 interface Saver {
 
-    void printResult()
+    static final String ANY = ''
 
     void processElement(NodeChild element)
+    void printResult()
+    void finish()
 
 }
