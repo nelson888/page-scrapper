@@ -57,7 +57,10 @@ class ImageSaver extends AbstractSaver {
             Printer.print('no error were encountered')
         } else {
             for (Integer errorCode : errorsMap.keySet()) {
-                printError(errorCode)
+                if (errorCode != 0) {
+                    printError(errorCode)
+                }
+
             }
         }
     }

@@ -8,7 +8,7 @@ import java.util.concurrent.Executor
 class LinkSaver extends FileSaver {
 
     LinkSaver(Executor executor, File dir) {
-        super(executor, dir, 'a', 'links.txt')
+        super(executor, dir, 'a', 'links.txt', 'link')
     }
 
     @Override
@@ -21,12 +21,4 @@ class LinkSaver extends FileSaver {
         return null
     }
 
-    @Override
-    void printResult() {
-        Printer.print("The links were saved in $fileName")
-        Printer.print("$treatedCount links were treated")
-        if (failCount > 0) {
-            Printer.print("$failCount links couldn't be saved")
-        }
-    }
 }

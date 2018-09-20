@@ -14,11 +14,12 @@ abstract class FileSaver extends AbstractSaver {
     final BlockingQueue<String> textQueue = new LinkedBlockingQueue<>()
     private static final String END = "" //used to tell the worker thread that it must stop
     private final String fileName
+    private final String dataName
     private int failCount = 0
 
-    FileSaver(Executor executor, File dir, String tag, String name) {
+    FileSaver(Executor executor, File dir, String tag, String name, String dataName) {
         super(executor, dir, tag)
-
+        this.dataName = dataName
         File file = getAvailableFile(name)
         fileName = file.getName()
         if (!file.createNewFile()) {
@@ -57,20 +58,21 @@ abstract class FileSaver extends AbstractSaver {
 
     abstract String processData(NodeChild element)
 
-    String getFileName() {
-        return fileName
-    }
-
-    int getFailCount() {
-        return failCount
-    }
-
     @Override
     void finish() {
         textQueue.add(END)
         int returnCode = executorService.take().get()
         if (returnCode == 1) {
             Printer.print("The saving may not have finished because the process was interrupted")
+        }
+    }
+
+    @Override
+    void printResult() {
+        Printer.print("The ${dataName}s were saved in $fileName")
+        Printer.print("$treatedCount ${dataName}s were treated")
+        if (failCount > 0) {
+            Printer.print("$failCount ${dataName}s couldn't be saved")
         }
     }
 }
