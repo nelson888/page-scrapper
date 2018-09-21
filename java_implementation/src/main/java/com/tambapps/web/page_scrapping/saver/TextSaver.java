@@ -18,6 +18,9 @@ public class TextSaver extends FileSaver {
       return null;
     }
     text = text.trim();
+    if (text.isEmpty()) {
+      return null;
+    }
     String tagName = element.tagName();
     return String.format("%s: ``` %s ```", tagName, text);
   }
