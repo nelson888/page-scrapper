@@ -13,8 +13,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class FileSaver extends AbstractSaver {
 
-  private final BlockingQueue<String> textQueue = new LinkedBlockingQueue<>();
   private static final String END = ""; //used to tell the worker thread that it must stop
+  private final BlockingQueue<String> textQueue = new LinkedBlockingQueue<>();
   private final String fileName;
   private final String dataName;
   private int failCount = 0;
@@ -40,24 +40,24 @@ public abstract class FileSaver extends AbstractSaver {
     }
 
     executorService.submit(() -> {
-    while (true) {
-      String text;
-      try {
-        text = textQueue.take();
-      } catch (InterruptedException e) {
-        return 1;
+      while (true) {
+        String text;
+        try {
+          text = textQueue.take();
+        } catch (InterruptedException e) {
+          return 1;
+        }
+        if (END == text) {
+          return 0;
+        }
+        try {
+          writer.write(text + "\n");
+        } catch (IOException e) {
+          Printer.verbose("Error while writing $text: %s", e.getMessage());
+          failCount++;
+        }
       }
-      if (END == text) {
-        return 0;
-      }
-      try {
-        writer.write(text + "\n");
-      } catch (IOException e) {
-        Printer.verbose("Error while writing $text: %s", e.getMessage());
-        failCount++;
-      }
-    }
-        });
+    });
   }
 
   @Override

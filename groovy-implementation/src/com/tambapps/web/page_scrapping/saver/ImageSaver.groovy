@@ -22,7 +22,6 @@ class ImageSaver extends AbstractSaver {
             return true
         }
         return false
-
     }
 
     private Callable<Integer> createTask(String link) {
@@ -63,7 +62,6 @@ class ImageSaver extends AbstractSaver {
                 if (errorCode != 0) {
                     printError(errorCode)
                 }
-
             }
         }
     }

@@ -14,6 +14,7 @@ import groovy.util.slurpersupport.NodeChild
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+
 @Grab('org.jsoup:jsoup:1.11.3')
 
 Args arguments = new Args()
@@ -52,6 +53,7 @@ executor.shutdownNow()
 /*
  functions
  */
+
 Saver getSaver(ScrapingType type, Executor executor, File dir) {
     switch (type) {
         case ScrapingType.LINKS:
