@@ -11,12 +11,10 @@ import com.tambapps.web.page_scrapping.saver.TextSaver
 import com.tambapps.web.page_scrapping.util.Printer
 import groovy.util.slurpersupport.NodeChild
 
-@Grab(group = 'net.sourceforge.nekohtml', module = 'nekohtml', version = '1.9.14')
-import org.cyberneko.html.parsers.SAXParser as HtmlParser
-
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+@Grab('org.jsoup:jsoup:1.11.3')
 
 Args arguments = new Args()
 JCommander jCommander = JCommander.newInstance(arguments)
@@ -32,7 +30,7 @@ Printer.start(executor, arguments.verbose)
 File dir = arguments.directory
 
 Set<Saver> savers = arguments.types.collect { return getSaver(it, executor, dir) }.toSet()
-XmlSlurper slurper = new XmlSlurper(new HtmlParser())
+
 String typesUsed = arguments.types.stream().map({ it.name().toLowerCase() }).reduce({
     s1, s2 -> s1 + ', ' + s2
 }).get()
@@ -40,7 +38,7 @@ Printer.print("About to save $typesUsed")
 
 for (String url : arguments.urls) {
     Printer.newLine()
-    scrapUrl(slurper, url, savers)
+    scrapUrl(url, savers)
 }
 
 savers.each({
@@ -65,20 +63,23 @@ Saver getSaver(ScrapingType type, Executor executor, File dir) {
     }
 }
 
-void scrapUrl(XmlSlurper slurper, String url, Set<Saver> savers) {
+void scrapUrl(String url, Set<Saver> savers) {
     Printer.print("Processing url $url")
 
-    def page
+    def document
     try {
-        page = slurper.parse(url)
-    } catch (IOException e) {
-        Printer.print("Error while accessing this url. Skipping it")
+        document = org.jsoup.Jsoup.connect(url).get()
+    } catch (org.jsoup.HttpStatusException e) {
+        Printer.print("Error while connecting to url: Status Code: $e.statusCode")
+        return
+    } catch (IOException | IllegalArgumentException e) {
+        Printer.print("Error while accessing url: $e.message")
         return
     }
 
-    for (NodeChild node : page.breadthFirst()) {
+    for (def element : document.select("*")) {
         savers.forEach {
-            it.processElement(node)
+            it.processElement(element)
         }
     }
 }

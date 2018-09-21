@@ -1,7 +1,6 @@
 package com.tambapps.web.page_scrapping.saver
 
 import groovy.transform.PackageScope
-import groovy.util.slurpersupport.NodeChild
 
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorCompletionService
@@ -20,15 +19,15 @@ abstract class AbstractSaver implements Saver {
         executorService = new ExecutorCompletionService<>(executor)
     }
 
-    void processElement(NodeChild element) {
-        if (ANY.is(tag) || tag.equalsIgnoreCase(element.name())) {
+    void processElement(def element) {
+        if (ANY.is(tag) || tag.equalsIgnoreCase(element.tagName())) {
             if (process(element)) {
                 treatedCount++
             }
         }
     }
 
-    protected abstract boolean process(NodeChild element)
+    protected abstract boolean process(def element)
 
     protected File getAvailableFile(String name) {
         File file = new File(dir, name)
@@ -54,5 +53,9 @@ abstract class AbstractSaver implements Saver {
 
     protected int getTreatedCount() {
         return treatedCount
+    }
+
+    boolean isValidLink(String link) {
+        return link && ['http', 'www'].any({ link.startsWith(it) })
     }
 }

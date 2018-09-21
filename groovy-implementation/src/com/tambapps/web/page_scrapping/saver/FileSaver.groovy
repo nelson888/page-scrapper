@@ -2,7 +2,6 @@ package com.tambapps.web.page_scrapping.saver
 
 import com.tambapps.web.page_scrapping.util.Printer
 import groovy.transform.PackageScope
-import groovy.util.slurpersupport.NodeChild
 
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.Executor
@@ -47,7 +46,7 @@ abstract class FileSaver extends AbstractSaver {
     }
 
     @Override
-    protected final boolean process(NodeChild element) {
+    protected final boolean process(def element) {
         String text = processData(element)
         if (text) {
             textQueue.add(text)
@@ -56,7 +55,7 @@ abstract class FileSaver extends AbstractSaver {
         return false
     }
 
-    abstract String processData(NodeChild element)
+    abstract String processData(def element)
 
     @Override
     void finish() {
@@ -75,4 +74,5 @@ abstract class FileSaver extends AbstractSaver {
             Printer.print("$failCount ${dataName}s couldn't be saved")
         }
     }
+
 }

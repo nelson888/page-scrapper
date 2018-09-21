@@ -1,12 +1,10 @@
 package com.tambapps.web.page_scrapping.saver
 
-import groovy.util.slurpersupport.NodeChild
-
 interface Saver {
 
     static final String ANY = ''
 
-    void processElement(NodeChild element)
+    void processElement(def element)
     void printResult()
     void finish()
 

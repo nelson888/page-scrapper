@@ -1,7 +1,6 @@
 package com.tambapps.web.page_scrapping.saver
 
 import com.tambapps.web.page_scrapping.util.Printer
-import groovy.util.slurpersupport.NodeChild
 
 import java.nio.file.Files
 import java.util.concurrent.Callable
@@ -16,15 +15,19 @@ class ImageSaver extends AbstractSaver {
     }
 
     @Override
-    boolean process(NodeChild element) {
-        executorService.submit(createTask(element))
-        return true
+    boolean process(def element) {
+        String link = element.attributes().get('src')
+        if (isValidLink(link)) {
+            executorService.submit(createTask(link))
+            return true
+        }
+        return false
+
     }
 
-    private Callable<Integer> createTask(NodeChild element) {
+    private Callable<Integer> createTask(String link) {
         return {
             int returnCode = 0
-            String link = element.attributes().get('src')
             URL url
             try {
                 url = new URL(link)

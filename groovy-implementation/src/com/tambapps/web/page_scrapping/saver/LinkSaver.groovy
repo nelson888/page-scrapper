@@ -1,7 +1,6 @@
 package com.tambapps.web.page_scrapping.saver
 
 import com.tambapps.web.page_scrapping.util.Printer
-import groovy.util.slurpersupport.NodeChild
 
 import java.util.concurrent.Executor
 
@@ -12,9 +11,9 @@ class LinkSaver extends FileSaver {
     }
 
     @Override
-    String processData(NodeChild element) {
+    String processData(def element) {
         String link = ((String) element.attributes().get('href'))?.trim()
-        if (link && ['http', 'www'].any({ link.startsWith(it) })) {
+        if (isValidLink(link)) {
             Printer.verbose("Found link $link")
             return link
         }
