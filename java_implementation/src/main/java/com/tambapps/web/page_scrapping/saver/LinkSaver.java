@@ -4,7 +4,6 @@ import org.jsoup.nodes.Element;
 
 import java.io.File;
 import java.util.concurrent.Executor;
-import java.util.stream.Stream;
 
 public class LinkSaver extends FileSaver {
 
@@ -18,8 +17,7 @@ public class LinkSaver extends FileSaver {
     if (link != null) {
       link = link.trim();
     }
-    if (link != null && !link.isEmpty() &&
-        Stream.of("http", "www").anyMatch(link::startsWith)) {
+    if (isValidLink(link)) {
       return link;
     }
     return null;

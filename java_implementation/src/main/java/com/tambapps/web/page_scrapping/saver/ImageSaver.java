@@ -30,14 +30,17 @@ public class ImageSaver extends AbstractSaver {
 
   @Override
   public boolean process(Element element) {
-    executorService.submit(createTask(element));
-    return true;
+    String link = element.attributes().get("src");
+    if (isValidLink(link)) {
+      executorService.submit(createTask(link));
+      return true;
+    }
+    return false;
   }
 
-  Callable<Integer> createTask(Element element) {
+  Callable<Integer> createTask(String link) {
     return () -> {
       int returnCode = 0;
-      String link = element.attributes().get("src");
       URL url;
       try {
         url = new URL(link);

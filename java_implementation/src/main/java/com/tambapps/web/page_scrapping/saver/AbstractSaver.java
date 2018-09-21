@@ -5,6 +5,7 @@ import org.jsoup.nodes.Element;
 import java.io.File;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorCompletionService;
+import java.util.stream.Stream;
 
 abstract class AbstractSaver implements Saver {
   final ExecutorCompletionService<Integer> executorService;
@@ -51,5 +52,9 @@ abstract class AbstractSaver implements Saver {
 
   int getTreatedCount() {
     return treatedCount;
+  }
+
+  boolean isValidLink(String link) {
+    return link != null && Stream.of("http", "www").anyMatch(link::startsWith);
   }
 }
