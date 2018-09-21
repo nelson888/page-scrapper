@@ -9,13 +9,10 @@ import com.tambapps.web.page_scrapping.parameter.Args
 import com.tambapps.web.page_scrapping.parameter.ScrapingType
 import com.tambapps.web.page_scrapping.saver.TextSaver
 import com.tambapps.web.page_scrapping.util.Printer
-import groovy.util.slurpersupport.NodeChild
 
 import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
-@Grab('org.jsoup:jsoup:1.11.3')
 
 Args arguments = new Args()
 JCommander jCommander = JCommander.newInstance(arguments)
@@ -65,6 +62,7 @@ Saver getSaver(ScrapingType type, Executor executor, File dir) {
     }
 }
 
+@Grab('org.jsoup:jsoup:1.11.3')
 void scrapUrl(String url, Set<Saver> savers) {
     Printer.print("Processing url $url")
 
