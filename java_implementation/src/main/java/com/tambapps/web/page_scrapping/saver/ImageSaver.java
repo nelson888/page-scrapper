@@ -38,7 +38,7 @@ public class ImageSaver extends AbstractSaver {
     return false;
   }
 
-  Callable<Integer> createTask(String link) {
+  private Callable<Integer> createTask(String link) {
     return () -> {
       int returnCode = 0;
       URL url;
