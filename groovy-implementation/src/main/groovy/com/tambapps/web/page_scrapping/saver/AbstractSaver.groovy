@@ -40,7 +40,7 @@ abstract class AbstractSaver implements Saver {
                 it.toString()
             }
             String fileName
-            if (name.contains(".")) {
+            if (name.contains('.')) {
                 int dotIndex = name.indexOf('.')
                 fileName = name.substring(0, dotIndex) + '_' + number + name.substring(dotIndex)
             } else {
