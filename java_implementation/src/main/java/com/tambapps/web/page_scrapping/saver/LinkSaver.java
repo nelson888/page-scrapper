@@ -3,24 +3,25 @@ package com.tambapps.web.page_scrapping.saver;
 import org.jsoup.nodes.Element;
 
 import java.io.File;
-import java.util.concurrent.Executor;
 
-public class LinkSaver extends FileSaver {
+public class LinkSaver extends FileSaver implements LinkExtractor {
 
-  public LinkSaver(Executor executor, File dir) {
-    super(executor, dir, "a", "links.txt", "link");
+  private static final String DATA_NAME = "links";
+  private static final String FILENAME = DATA_NAME + ".txt";
+  private static final String HREF_ATTRIBUTE = "href";
+
+  public LinkSaver(File directory) {
+    super(new File(directory, FILENAME));
   }
 
   @Override
-  String processData(Element element) {
-    String link = element.attributes().get("href");
-    if (link != null) {
-      link = link.trim();
-    }
-    if (isValidLink(link)) {
-      return link;
-    }
-    return null;
+  protected String mapToData(Element element) {
+    return extractLink(element, HREF_ATTRIBUTE);
+  }
+
+  @Override
+  protected String dataName() {
+    return DATA_NAME;
   }
 
 }

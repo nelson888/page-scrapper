@@ -3,16 +3,17 @@ package com.tambapps.web.page_scrapping.saver;
 import org.jsoup.nodes.Element;
 
 import java.io.File;
-import java.util.concurrent.Executor;
 
 public class TextSaver extends FileSaver {
 
-  public TextSaver(Executor executor, File dir) {
-    super(executor, dir, Saver.ANY, "text.txt", "text");
+  private static final String FILENAME = "texts.txt";
+
+  public TextSaver(File directory) {
+    super(new File(directory, FILENAME));
   }
 
   @Override
-  String processData(Element element) {
+  protected String mapToData(Element element) {
     String text = element.text();
     if (text == null) {
       return null;
@@ -22,7 +23,11 @@ public class TextSaver extends FileSaver {
       return null;
     }
     String tagName = element.tagName();
-    return String.format("%s: ``` %s ```", tagName, text);
+    return String.format("%s:  %s", tagName, text);
   }
 
+  @Override
+  protected String dataName() {
+    return "texts";
+  }
 }

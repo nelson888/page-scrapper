@@ -1,60 +1,57 @@
 package com.tambapps.web.page_scrapping.saver;
 
 import org.jsoup.nodes.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.stream.Stream;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
-abstract class AbstractSaver implements Saver {
-  final ExecutorCompletionService<Integer> executorService;
-  private final String tag;
-  private final File dir;
-  private int treatedCount;
+public abstract class AbstractSaver implements Saver {
 
-  AbstractSaver(Executor executor, File dir, String tag) {
-    this.tag = tag;
-    this.dir = dir;
-    treatedCount = 0;
-    executorService = new ExecutorCompletionService<>(executor);
-  }
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSaver.class);
+
+  private final Map<Outcome, AtomicInteger> outcomeMap = Map.of(
+      Outcome.SUCCESS, new AtomicInteger(0),
+      Outcome.ERROR, new AtomicInteger(0));
 
   @Override
-  public void processElement(Element element) {
-    if (ANY == tag || tag.equalsIgnoreCase(element.tagName())) {
-      if (process(element)) {
-        treatedCount++;
+  public Optional<Future> process(ExecutorService executor, Element element) {
+    String data = mapToData(element);
+    if (data == null) {
+      return Optional.empty();
+    }
+    Future future = executor.submit(() -> {
+      try {
+        save(data);
+        outcomeMap.get(Outcome.SUCCESS).incrementAndGet();
+      } catch (IOException e) {
+        outcomeMap.get(Outcome.ERROR).incrementAndGet();
       }
+    });
+    return Optional.of(future);
+  }
+
+  protected abstract String mapToData(Element element);
+  protected abstract void save(String data) throws IOException;
+  protected abstract String dataName();
+
+  @Override
+  public void printResult() {
+    String name = dataName();
+    long total = outcomeMap.values().stream().mapToInt(AtomicInteger::get).sum();
+    LOGGER.info("Processed {} {} in total", total, name);
+
+    if (total == outcomeMap.get(Outcome.SUCCESS).get()) {
+      LOGGER.info("All {} were saved successfully", name);
+    } else {
+      LOGGER.info("{} {} were saved successfully", outcomeMap.get(Outcome.SUCCESS), name);
+      LOGGER.info("{} {} were not saved due to an error", outcomeMap.get(Outcome.ERROR), name);
     }
   }
 
-  abstract boolean process(Element element);
-
-  File getAvailableFile(String name) {
-    File file = new File(dir, name);
-    for (int i = 0; file.exists(); i++) {
-      StringBuilder number = new StringBuilder(String.valueOf(i));
-      while (number.length() < 3) { //max = 999
-        number.insert(0, '0');
-      }
-      String fileName;
-      if (name.contains(".")) {
-        int dotIndex = name.indexOf('.');
-        fileName = name.substring(0, dotIndex) + '_' + number + name.substring(dotIndex);
-      } else {
-        fileName = name + '_' + number;
-      }
-      file = new File(dir, fileName);
-    }
-    return file;
-  }
-
-  int getTreatedCount() {
-    return treatedCount;
-  }
-
-  boolean isValidLink(String link) {
-    return link != null && Stream.of("http", "www").anyMatch(link::startsWith);
-  }
 }

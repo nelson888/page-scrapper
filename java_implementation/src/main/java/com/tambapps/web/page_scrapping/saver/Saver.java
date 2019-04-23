@@ -2,14 +2,14 @@ package com.tambapps.web.page_scrapping.saver;
 
 import org.jsoup.nodes.Element;
 
-public interface Saver {
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
-  String ANY = "";
+public interface Saver {
 
   void printResult();
 
-  void processElement(Element element);
-
-  void finish();
+  Optional<Future> process(ExecutorService executor, Element element);
 
 }
